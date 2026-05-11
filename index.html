@@ -8,34 +8,49 @@
   </head>
   <body>
     <header class="topbar">
-      <div>
-        <p class="eyebrow">Project simulator</p>
-        <h1>PM for Kids</h1>
+      <div class="brand">
+        <div class="brand-mark" data-icon="briefcase" aria-hidden="true"></div>
+        <div>
+          <p class="eyebrow"><span data-icon="sparkles" aria-hidden="true"></span>Project simulator</p>
+          <h1>PM for Kids</h1>
+        </div>
       </div>
       <div class="top-actions">
-        <button id="resetButton" class="button secondary" type="button">Reset</button>
-        <button id="finishButton" class="button primary" type="button">Finish Project</button>
+        <button id="resetButton" class="button secondary" type="button">
+          <span data-icon="refresh" aria-hidden="true"></span>Reset
+        </button>
+        <button id="finishButton" class="button primary" type="button">
+          <span data-icon="flag" aria-hidden="true"></span>Finish Project
+        </button>
       </div>
     </header>
 
     <main class="app-shell">
       <section class="sidebar" aria-label="Project controls">
         <div class="project-summary">
-          <p class="eyebrow">Current project</p>
+          <p class="eyebrow"><span data-icon="target" aria-hidden="true"></span>Current project</p>
           <h2 id="projectTitle">School Science Fair Booth</h2>
           <p id="projectGoal" class="muted"></p>
           <div class="week-panel">
-            <div>
-              <span class="label">Week</span>
-              <strong id="weekValue">1 of 4</strong>
+            <div class="week-row">
+              <div>
+                <span class="label"><span data-icon="calendar" aria-hidden="true"></span>Week</span>
+                <strong id="weekValue">1 of 4</strong>
+              </div>
+              <button id="advanceButton" class="button primary" type="button">
+                <span data-icon="arrowRight" aria-hidden="true"></span>Advance Week
+              </button>
             </div>
-            <button id="advanceButton" class="button primary" type="button">Advance Week</button>
+            <div id="weekProgress" class="week-progress" aria-hidden="true"></div>
           </div>
         </div>
 
         <div class="panel">
           <div class="panel-heading">
-            <h2>Project Health</h2>
+            <h2>
+              <span class="heading-icon success" data-icon="heartPulse" aria-hidden="true"></span>
+              Project Health
+            </h2>
             <span id="savedStatus" class="save-status">Saved</span>
           </div>
           <div id="meters" class="meters"></div>
@@ -43,7 +58,10 @@
 
         <div class="panel">
           <div class="panel-heading">
-            <h2>Team</h2>
+            <h2>
+              <span class="heading-icon info" data-icon="users" aria-hidden="true"></span>
+              Team
+            </h2>
             <span class="small-note">Capacity resets each week</span>
           </div>
           <div id="teamList" class="team-list"></div>
@@ -51,7 +69,10 @@
 
         <div class="panel">
           <div class="panel-heading">
-            <h2>Risk Register</h2>
+            <h2>
+              <span class="heading-icon warning" data-icon="shieldAlert" aria-hidden="true"></span>
+              Risk Register
+            </h2>
             <span class="small-note">Plan before trouble hits</span>
           </div>
           <div id="riskList" class="risk-list"></div>
@@ -61,12 +82,16 @@
       <section class="board-section" aria-label="Task board">
         <div class="board-header">
           <div>
-            <p class="eyebrow">Science fair delivery board</p>
+            <p class="eyebrow"><span data-icon="kanban" aria-hidden="true"></span>Science fair delivery board</p>
             <h2>Plan the work, react to surprises, and deliver well.</h2>
           </div>
           <div class="board-stats">
-            <span id="doneCount">0 done</span>
-            <span id="blockedCount">0 blocked</span>
+            <span id="doneCount" class="stat-done">
+              <span data-icon="checkCircle" aria-hidden="true"></span>0 done
+            </span>
+            <span id="blockedCount" class="stat-blocked">
+              <span data-icon="alertTriangle" aria-hidden="true"></span>0 blocked
+            </span>
           </div>
         </div>
         <div id="board" class="board"></div>
@@ -74,8 +99,13 @@
 
       <aside class="activity-panel" aria-label="Activity log">
         <div class="panel-heading">
-          <h2>Activity</h2>
-          <button id="clearLogButton" class="text-button" type="button">Clear</button>
+          <h2>
+            <span class="heading-icon purple" data-icon="scroll" aria-hidden="true"></span>
+            Activity
+          </h2>
+          <button id="clearLogButton" class="text-button" type="button">
+            <span data-icon="trash" aria-hidden="true"></span>Clear
+          </button>
         </div>
         <ol id="activityLog" class="activity-log"></ol>
       </aside>
@@ -83,7 +113,7 @@
 
     <dialog id="eventDialog" class="dialog">
       <div class="dialog-header">
-        <p class="eyebrow" id="eventType">Scenario card</p>
+        <p class="eyebrow" id="eventType"><span data-icon="lightbulb" aria-hidden="true"></span>Scenario card</p>
         <h2 id="eventTitle"></h2>
       </div>
       <p id="eventBody" class="dialog-copy"></p>
@@ -92,12 +122,14 @@
 
     <dialog id="scoreDialog" class="dialog wide">
       <div class="dialog-header">
-        <p class="eyebrow">Retrospective</p>
+        <p class="eyebrow"><span data-icon="trophy" aria-hidden="true"></span>Retrospective</p>
         <h2>Project scorecard</h2>
       </div>
       <div id="scoreContent"></div>
       <div class="dialog-actions">
-        <button id="playAgainButton" class="button primary" type="button">Play Again</button>
+        <button id="playAgainButton" class="button primary" type="button">
+          <span data-icon="refresh" aria-hidden="true"></span>Play Again
+        </button>
         <button id="closeScoreButton" class="button secondary" type="button">Keep Reviewing</button>
       </div>
     </dialog>
