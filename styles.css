@@ -251,12 +251,14 @@ h3 {
   background: var(--teal);
 }
 
-.team-list {
+.team-list,
+.risk-list {
   display: grid;
   gap: 10px;
 }
 
-.team-card {
+.team-card,
+.risk-card {
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -266,6 +268,37 @@ h3 {
 .team-card strong {
   display: block;
   margin-bottom: 4px;
+}
+
+.risk-card {
+  display: grid;
+  gap: 10px;
+}
+
+.risk-card.mitigated {
+  border-color: rgba(47, 138, 69, 0.35);
+  background: #f5fbf6;
+}
+
+.risk-card strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.risk-card p {
+  margin-bottom: 0;
+}
+
+.risk-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.risk-footer .button {
+  min-height: 34px;
+  padding: 0 10px;
 }
 
 .tag-row {

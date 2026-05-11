@@ -121,6 +121,56 @@ const scenario = {
       qualityImpact: 5,
     },
   ],
+  risks: [
+    {
+      id: "supplier-backup",
+      title: "Supplies might arrive late",
+      description: "Reserve backup materials before the team needs them.",
+      eventId: "supplier-delay",
+      cost: 8,
+      response: {
+        label: "Backup supplies ready",
+        outcome: "Your backup materials softened the supplier delay.",
+        effects: { trust: 5, quality: 4 },
+      },
+    },
+    {
+      id: "team-coverage",
+      title: "A teammate might be unavailable",
+      description: "Cross-train the team so one person can cover another task.",
+      eventId: "team-sick",
+      cost: 6,
+      response: {
+        label: "Coverage plan used",
+        outcome: "The cross-training plan helped the team absorb the absence.",
+        effects: { morale: 7, trust: 3 },
+      },
+    },
+    {
+      id: "presentation-review",
+      title: "The booth message might be unclear",
+      description: "Schedule a quick review before the judge sees the booth.",
+      eventId: "judge-clarity",
+      cost: 4,
+      response: {
+        label: "Early review helped",
+        outcome: "Your early review made the judge feedback easier to handle.",
+        effects: { quality: 8, trust: 3 },
+      },
+    },
+    {
+      id: "weather-plan",
+      title: "Rain might affect transport",
+      description: "Pack labels and covers so booth parts survive the trip.",
+      eventId: "weather-risk",
+      cost: 5,
+      response: {
+        label: "Transport plan ready",
+        outcome: "The packing plan protected the booth materials from rain.",
+        effects: { quality: 4, morale: 4 },
+      },
+    },
+  ],
   events: [
     {
       id: "supplier-delay",
@@ -515,6 +565,7 @@ const els = {
   weekValue: document.querySelector("#weekValue"),
   meters: document.querySelector("#meters"),
   teamList: document.querySelector("#teamList"),
+  riskList: document.querySelector("#riskList"),
   board: document.querySelector("#board"),
   doneCount: document.querySelector("#doneCount"),
   blockedCount: document.querySelector("#blockedCount"),
@@ -554,6 +605,7 @@ function createInitialState() {
       startedWeek: null,
       completedWeek: null,
     })),
+    mitigatedRisks: [],
     usedEvents: [],
     activeEvent: null,
     log: [
@@ -575,10 +627,26 @@ function loadState() {
     if (!parsed || parsed.scenarioId !== scenario.id) {
       return createInitialState();
     }
-    return parsed.state;
+    return normalizeState(parsed.state);
   } catch {
     return createInitialState();
   }
+}
+
+function normalizeState(savedState) {
+  const initialState = createInitialState();
+  return {
+    ...initialState,
+    ...savedState,
+    teamCapacity: {
+      ...initialState.teamCapacity,
+      ...(savedState.teamCapacity || {}),
+    },
+    mitigatedRisks: savedState.mitigatedRisks || [],
+    usedEvents: savedState.usedEvents || [],
+    log: savedState.log || initialState.log,
+    lessons: savedState.lessons || [],
+  };
 }
 
 function saveState() {
@@ -620,6 +688,14 @@ function memberById(memberId) {
   return scenario.team.find((member) => member.id === memberId);
 }
 
+function riskByEvent(eventId) {
+  return scenario.risks.find((risk) => risk.eventId === eventId);
+}
+
+function hasMitigatedRisk(riskId) {
+  return state.mitigatedRisks.includes(riskId);
+}
+
 function applyEffects(effects) {
   state.spent = Math.max(0, state.spent + (effects.spent || 0));
   state.quality = clamp(state.quality + (effects.quality || 0));
@@ -641,9 +717,63 @@ function render() {
 
   renderMeters();
   renderTeam();
+  renderRisks();
   renderBoard();
   renderLog();
   saveState();
+}
+
+function renderRisks() {
+  els.riskList.innerHTML = scenario.risks
+    .map((risk) => {
+      const mitigated = hasMitigatedRisk(risk.id);
+      const canAfford = moneyRemaining() >= risk.cost;
+      return `
+        <article class="risk-card ${mitigated ? "mitigated" : ""}">
+          <div>
+            <strong>${risk.title}</strong>
+            <p class="muted">${risk.description}</p>
+          </div>
+          <div class="risk-footer">
+            <span class="tag">${risk.cost} coins</span>
+            <button
+              class="button secondary"
+              type="button"
+              data-risk="${risk.id}"
+              ${mitigated || !canAfford || state.finished ? "disabled" : ""}
+            >
+              ${mitigated ? "Planned" : "Mitigate"}
+            </button>
+          </div>
+          ${!mitigated && !canAfford ? `<p class="warning">Not enough budget.</p>` : ""}
+        </article>
+      `;
+    })
+    .join("");
+
+  scenario.risks.forEach((risk) => {
+    const button = document.querySelector(`[data-risk="${risk.id}"]`);
+    if (button) {
+      button.addEventListener("click", () => mitigateRisk(risk.id));
+    }
+  });
+}
+
+function mitigateRisk(riskId) {
+  const risk = scenario.risks.find((candidate) => candidate.id === riskId);
+  if (!risk || hasMitigatedRisk(risk.id) || state.finished) return;
+
+  if (moneyRemaining() < risk.cost) {
+    addLog(`${risk.title} needs more budget than you have left.`);
+    render();
+    return;
+  }
+
+  state.spent += risk.cost;
+  state.mitigatedRisks.push(risk.id);
+  state.trust = clamp(state.trust + 2);
+  addLog(`${risk.title} mitigated. You spent ${risk.cost} coins to reduce future risk.`);
+  render();
 }
 
 function renderMeters() {
@@ -942,9 +1072,14 @@ function showEvent(event) {
     return;
   }
 
+  const risk = riskByEvent(event.id);
+  const prepared = risk && hasMitigatedRisk(risk.id);
+
   els.eventType.textContent = `Scenario card · Week ${state.week}`;
   els.eventTitle.textContent = event.title;
-  els.eventBody.textContent = event.body;
+  els.eventBody.textContent = prepared
+    ? `${event.body} Your risk register has a response ready: ${risk.response.label}.`
+    : event.body;
   els.eventChoices.innerHTML = event.choices
     .map(
       (choice, index) => `
@@ -967,14 +1102,25 @@ function chooseEvent(choiceIndex) {
   const event = scenario.events.find((candidate) => candidate.id === state.activeEvent);
   if (!event) return;
   const choice = event.choices[choiceIndex];
+  const risk = riskByEvent(event.id);
+  const prepared = risk && hasMitigatedRisk(risk.id);
 
   applyEffects(choice.effects);
+  if (prepared) {
+    applyEffects(risk.response.effects);
+  }
   state.usedEvents.push(event.id);
   state.activeEvent = null;
   state.lessons.unshift(choice.lesson);
+  if (prepared) {
+    state.lessons.unshift("Risk responses work best when they are planned before the problem happens.");
+  }
   state.lessons = state.lessons.slice(0, 6);
 
   addLog(`${event.title}: ${choice.outcome}`);
+  if (prepared) {
+    addLog(`${risk.response.label}: ${risk.response.outcome}`);
+  }
   els.eventDialog.close();
   render();
 }
@@ -1007,6 +1153,7 @@ function showScorecard() {
   const lessons = state.lessons.length
     ? state.lessons
     : ["Good PMs make tradeoffs visible and communicate early."];
+  const mitigatedCount = state.mitigatedRisks.length;
 
   els.scoreContent.innerHTML = `
     <p class="muted">${outcome}</p>
@@ -1017,6 +1164,7 @@ function showScorecard() {
       <div class="score-card"><span>Quality</span><strong>${state.quality}/100</strong></div>
       <div class="score-card"><span>Team morale</span><strong>${state.morale}/100</strong></div>
       <div class="score-card"><span>Stakeholder trust</span><strong>${state.trust}/100</strong></div>
+      <div class="score-card"><span>Risks mitigated</span><strong>${mitigatedCount}/${scenario.risks.length}</strong></div>
     </div>
     <h3>Retrospective</h3>
     <ol class="retro-list">

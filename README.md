@@ -10,6 +10,7 @@ The first static prototype is playable in the browser:
 - Manage the School Science Fair Booth project.
 - Move tasks through `Todo`, `Doing`, `Review`, and `Done`.
 - Assign teammates based on capacity and skills.
+- Mitigate risks before matching scenario cards appear.
 - Watch budget, scope, quality, morale, and stakeholder trust.
 - Advance weeks and respond to PM scenario cards.
 - Finish the project to see a scorecard and retrospective.
