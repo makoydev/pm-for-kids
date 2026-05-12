@@ -1,4 +1,5 @@
 const STORAGE_KEY = "pm-for-kids-state-v1";
+const UI_PREFS_KEY = "pm-for-kids-ui-v1";
 
 const ICONS = {
   briefcase: `<path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 13h20"/>`,
@@ -30,6 +31,7 @@ const ICONS = {
   eye: `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`,
   circle: `<circle cx="12" cy="12" r="9"/>`,
   clock: `<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>`,
+  x: `<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`,
 };
 
 function icon(name, options = {}) {
@@ -648,7 +650,45 @@ const els = {
   scoreContent: document.querySelector("#scoreContent"),
   playAgainButton: document.querySelector("#playAgainButton"),
   closeScoreButton: document.querySelector("#closeScoreButton"),
+  appShell: document.querySelector(".app-shell"),
+  toggleActivityButton: document.querySelector("#toggleActivityButton"),
+  closeActivityButton: document.querySelector("#closeActivityButton"),
 };
+
+function loadUIPrefs() {
+  try {
+    const raw = window.localStorage.getItem(UI_PREFS_KEY);
+    if (!raw) return { activityCollapsed: true };
+    const parsed = JSON.parse(raw);
+    return { activityCollapsed: parsed.activityCollapsed !== false };
+  } catch {
+    return { activityCollapsed: true };
+  }
+}
+
+function saveUIPrefs() {
+  window.localStorage.setItem(UI_PREFS_KEY, JSON.stringify(uiPrefs));
+}
+
+const uiPrefs = loadUIPrefs();
+
+function applyActivityCollapsed() {
+  const collapsed = uiPrefs.activityCollapsed;
+  els.appShell.classList.toggle("activity-collapsed", collapsed);
+  const label = els.toggleActivityButton.querySelector(".toggle-label");
+  if (label) label.textContent = collapsed ? "Show Activity" : "Hide Activity";
+  els.toggleActivityButton.setAttribute("aria-pressed", String(!collapsed));
+  els.toggleActivityButton.setAttribute(
+    "aria-label",
+    collapsed ? "Show activity panel" : "Hide activity panel",
+  );
+}
+
+function setActivityCollapsed(collapsed) {
+  uiPrefs.activityCollapsed = collapsed;
+  saveUIPrefs();
+  applyActivityCollapsed();
+}
 
 function createInitialState() {
   const teamCapacity = Object.fromEntries(
@@ -1364,8 +1404,15 @@ els.clearLogButton.addEventListener("click", () => {
   state.log = [];
   render();
 });
+els.toggleActivityButton.addEventListener("click", () => {
+  setActivityCollapsed(!uiPrefs.activityCollapsed);
+});
+els.closeActivityButton.addEventListener("click", () => {
+  setActivityCollapsed(true);
+});
 
 hydrateStaticIcons();
+applyActivityCollapsed();
 render();
 
 if (state.activeEvent) {

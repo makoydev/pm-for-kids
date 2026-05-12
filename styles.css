@@ -206,6 +206,15 @@ h3 {
   grid-template-columns: minmax(280px, 340px) minmax(0, 1fr) minmax(240px, 300px);
   gap: 18px;
   padding: 20px;
+  transition: grid-template-columns 220ms ease;
+}
+
+.app-shell.activity-collapsed {
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+}
+
+.app-shell.activity-collapsed .activity-panel {
+  display: none;
 }
 
 .sidebar,
@@ -374,6 +383,37 @@ h3 {
 
 .text-button:hover {
   background: var(--primary-soft);
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--muted);
+  transition: border-color 140ms ease, color 140ms ease, background 140ms ease;
+}
+
+.icon-button:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.panel-heading-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.button[aria-pressed="true"] {
+  background: var(--primary-soft);
+  border-color: #c7d2fe;
+  color: var(--primary-dark);
 }
 
 .panel-heading {

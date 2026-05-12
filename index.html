@@ -16,6 +16,9 @@
         </div>
       </div>
       <div class="top-actions">
+        <button id="toggleActivityButton" class="button secondary" type="button" aria-pressed="false" aria-controls="activityPanel">
+          <span data-icon="scroll" aria-hidden="true"></span><span class="toggle-label">Show Activity</span>
+        </button>
         <button id="resetButton" class="button secondary" type="button">
           <span data-icon="refresh" aria-hidden="true"></span>Reset
         </button>
@@ -97,15 +100,20 @@
         <div id="board" class="board"></div>
       </section>
 
-      <aside class="activity-panel" aria-label="Activity log">
+      <aside id="activityPanel" class="activity-panel" aria-label="Activity log">
         <div class="panel-heading">
           <h2>
             <span class="heading-icon purple" data-icon="scroll" aria-hidden="true"></span>
             Activity
           </h2>
-          <button id="clearLogButton" class="text-button" type="button">
-            <span data-icon="trash" aria-hidden="true"></span>Clear
-          </button>
+          <div class="panel-heading-actions">
+            <button id="clearLogButton" class="text-button" type="button">
+              <span data-icon="trash" aria-hidden="true"></span>Clear
+            </button>
+            <button id="closeActivityButton" class="icon-button" type="button" aria-label="Hide activity panel">
+              <span data-icon="x" aria-hidden="true"></span>
+            </button>
+          </div>
         </div>
         <ol id="activityLog" class="activity-log"></ol>
       </aside>
