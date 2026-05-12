@@ -847,6 +847,17 @@ function renderRisks() {
       const mitigated = hasMitigatedRisk(risk.id);
       const canAfford = moneyRemaining() >= risk.cost;
       const iconName = mitigated ? "checkCircle" : "shieldAlert";
+      const effects = risk.response?.effects || {};
+      const benefitTags = Object.entries(effects)
+        .filter(([, value]) => value > 0)
+        .map(
+          ([key, value]) =>
+            `<span class="tag benefit" title="If the risk happens, you gain +${value} ${key}">+${value} ${key}</span>`,
+        )
+        .join("");
+      const benefitRow = !mitigated && benefitTags
+        ? `<div class="risk-benefits">${benefitTags}</div>`
+        : "";
       return `
         <article class="risk-card ${mitigated ? "mitigated" : ""}">
           <div class="risk-head">
@@ -854,12 +865,13 @@ function renderRisks() {
             <div>
               <strong>${risk.title}</strong>
               <p>${risk.description}</p>
+              ${benefitRow}
             </div>
           </div>
           <div class="risk-footer">
-            <span class="tag coin">${icon("coins", { size: "sm" })}${risk.cost}</span>
+            <span class="tag coin" title="Cost to plan ahead">${icon("coins", { size: "sm" })}${risk.cost}</span>
             <button
-              class="button ${mitigated ? "secondary" : "primary"}"
+              class="button secondary"
               type="button"
               data-risk="${risk.id}"
               ${mitigated || !canAfford || state.finished ? "disabled" : ""}
@@ -1048,9 +1060,9 @@ function renderTask(task) {
       <div>
         <h3>${task.title}</h3>
         <div class="task-meta">
-          <span class="tag effort">${icon("zap", { size: "sm" })}${task.effort}</span>
-          <span class="tag coin">${icon("coins", { size: "sm" })}${task.cost}</span>
-          <span class="tag skill">${icon("wrench", { size: "sm" })}${task.skill}</span>
+          <span class="tag effort" title="Effort: ${task.effort} capacity used">${icon("zap", { size: "sm" })}${task.effort} effort</span>
+          <span class="tag coin" title="Cost: ${task.cost} coins from the budget">${icon("coins", { size: "sm" })}${task.cost}</span>
+          <span class="tag skill" title="Skill needed: ${task.skill}. Teammates with this skill do better work.">${icon("wrench", { size: "sm" })}${task.skill}</span>
         </div>
       </div>
       ${isBlocked ? `<p class="warning">${icon("alertTriangle", { size: "sm" })}Blocked by: ${blockedNames.join(", ")}</p>` : ""}
@@ -1060,35 +1072,48 @@ function renderTask(task) {
 }
 
 function renderTaskActions(task, actionLabel, assignee) {
-  const disableStart = task.status === "todo" && (!dependenciesDone(task) || moneyRemaining() < task.cost);
-  const warning =
-    task.status === "todo" && moneyRemaining() < task.cost
-      ? `<p class="warning">${icon("alertTriangle", { size: "sm" })}Not enough budget for this task.</p>`
-      : "";
+  const isTodo = task.status === "todo";
+  const noAssignee = isTodo && !task.assignee;
+  const blockedByDeps = isTodo && !dependenciesDone(task);
+  const overBudget = isTodo && moneyRemaining() < task.cost;
+  const disableStart = isTodo && (blockedByDeps || overBudget || noAssignee);
   const buttonVariant = task.status === "review" ? "success" : "primary";
   const buttonIcon = getActionIcon(task);
+
+  const budgetWarning = overBudget
+    ? `<p class="warning">${icon("alertTriangle", { size: "sm" })}Not enough budget for this task.</p>`
+    : "";
+  const assigneeHint = isTodo && noAssignee && !blockedByDeps && !overBudget
+    ? `<p class="hint muted">${icon("users", { size: "sm" })}Pick a teammate to start this task.</p>`
+    : "";
+  const matchHint = isTodo && assignee ? renderAssignmentHint(task, assignee) : "";
 
   return `
     <div class="task-actions">
       ${
-        task.status === "todo"
+        isTodo
           ? `
             <select data-assignee="${task.id}" aria-label="Assign ${task.title}">
-              <option value="">Assign teammate</option>
+              <option value="">Assign teammate…</option>
               ${scenario.team
-                .map(
-                  (member) => `
+                .map((member) => {
+                  const fit = member.skills.includes(task.skill) ? "✓ fit" : "stretch";
+                  const cap = state.teamCapacity[member.id];
+                  const overload = cap < task.effort ? " · over capacity" : "";
+                  return `
                     <option value="${member.id}" ${task.assignee === member.id ? "selected" : ""}>
-                      ${member.name} (${state.teamCapacity[member.id]} left)
+                      ${member.name} · ${cap}/${member.capacity} left · ${fit}${overload}
                     </option>
-                  `,
-                )
+                  `;
+                })
                 .join("")}
             </select>
           `
           : `<span class="muted">Assigned to ${assignee ? assignee.name : "the team"}</span>`
       }
-      ${warning}
+      ${assigneeHint}
+      ${matchHint}
+      ${budgetWarning}
       <button
         class="button ${buttonVariant}"
         type="button"
@@ -1099,6 +1124,35 @@ function renderTaskActions(task, actionLabel, assignee) {
       </button>
     </div>
   `;
+}
+
+function renderAssignmentHint(task, assignee) {
+  const cap = state.teamCapacity[assignee.id];
+  const overloaded = cap < task.effort;
+  const skillMatch = assignee.skills.includes(task.skill);
+  const parts = [];
+
+  if (overloaded) {
+    parts.push(
+      `<span class="hint warn">${icon("alertTriangle", { size: "sm" })}Needs ${task.effort}, only ${cap} left — will overload ${assignee.name} (−morale, −quality)</span>`,
+    );
+  } else {
+    parts.push(
+      `<span class="hint ok">${icon("checkCircle", { size: "sm" })}Uses ${task.effort} of ${cap} capacity</span>`,
+    );
+  }
+
+  if (skillMatch) {
+    parts.push(
+      `<span class="hint ok">${icon("sparkles", { size: "sm" })}${assignee.name} is strong at ${task.skill}</span>`,
+    );
+  } else {
+    parts.push(
+      `<span class="hint warn">${icon("alertTriangle", { size: "sm" })}${task.skill} is not ${assignee.name}'s strength (−morale)</span>`,
+    );
+  }
+
+  return `<div class="hint-stack">${parts.join("")}</div>`;
 }
 
 function renderDoneTask(task, assignee) {
@@ -1383,7 +1437,18 @@ function renderLog() {
   els.activityLog.innerHTML = state.log.map((item) => `<li>${item}</li>`).join("");
 }
 
+function hasProgress() {
+  if (state.week > 1 || state.spent > 0 || state.mitigatedRisks.length > 0) return true;
+  return state.tasks.some((task) => task.status !== "todo");
+}
+
 function resetGame() {
+  if (hasProgress() && !state.finished) {
+    const ok = window.confirm(
+      "Reset the project? Your current week, board, and decisions will be cleared. The project starts fresh from week 1.",
+    );
+    if (!ok) return;
+  }
   state = createInitialState();
   els.scoreDialog.close();
   if (els.eventDialog.open) {
@@ -1392,8 +1457,24 @@ function resetGame() {
   render();
 }
 
+function confirmFinish() {
+  if (state.finished) {
+    finishProject();
+    return;
+  }
+  const remaining = state.tasks.filter((task) => task.status !== "done").length;
+  if (remaining === 0) {
+    finishProject();
+    return;
+  }
+  const ok = window.confirm(
+    `Finish the project now? ${remaining} task${remaining === 1 ? "" : "s"} are still not done — the scorecard will lock in your current results.`,
+  );
+  if (ok) finishProject();
+}
+
 els.advanceButton.addEventListener("click", advanceWeek);
-els.finishButton.addEventListener("click", finishProject);
+els.finishButton.addEventListener("click", confirmFinish);
 els.resetButton.addEventListener("click", resetGame);
 els.playAgainButton.addEventListener("click", resetGame);
 els.closeScoreButton.addEventListener("click", () => els.scoreDialog.close());

@@ -937,6 +937,46 @@ h3 {
   margin-top: 2px;
 }
 
+.hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.hint svg.icon {
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.hint.ok { color: var(--success); }
+.hint.warn { color: var(--warning); }
+
+.hint-stack {
+  display: grid;
+  gap: 4px;
+  padding: 8px 10px;
+  background: var(--surface-soft);
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+}
+
+.risk-benefits {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.tag.benefit {
+  background: var(--success-soft);
+  color: var(--success);
+  font-variant-numeric: tabular-nums;
+}
+
 .activity-log {
   display: flex;
   flex-direction: column;
@@ -968,8 +1008,6 @@ h3 {
   box-shadow: 0 0 0 3px var(--primary-soft);
 }
 
-.activity-log li:nth-child(3n)::before { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.activity-log li:nth-child(3n+1)::before { background: var(--success); box-shadow: 0 0 0 3px var(--success-soft); }
 
 .dialog {
   width: min(540px, calc(100vw - 28px));
