@@ -632,6 +632,7 @@ const els = {
   meters: document.querySelector("#meters"),
   teamList: document.querySelector("#teamList"),
   riskList: document.querySelector("#riskList"),
+  coachPanel: document.querySelector("#coachPanel"),
   board: document.querySelector("#board"),
   doneCount: document.querySelector("#doneCount"),
   blockedCount: document.querySelector("#blockedCount"),
@@ -823,6 +824,7 @@ function render() {
   renderMeters();
   renderTeam();
   renderRisks();
+  renderCoachPanel();
   renderBoard();
   renderLog();
   saveState();
@@ -971,6 +973,155 @@ function renderMeters() {
     .join("");
 }
 
+function renderCoachPanel() {
+  if (!els.coachPanel) return;
+  const advice = getCoachAdvice();
+  const signals = [
+    `${completedTasks().length}/${state.tasks.length} tasks done`,
+    `${moneyRemaining()} coins left`,
+    `Week ${state.week}/${scenario.deadlineWeeks}`,
+  ];
+
+  els.coachPanel.className = `coach-panel ${advice.tone}`;
+  els.coachPanel.innerHTML = `
+    <div class="coach-main">
+      <span class="coach-icon">${icon(advice.icon)}</span>
+      <div>
+        <p class="eyebrow">Coach</p>
+        <strong>${advice.title}</strong>
+        <p>${advice.body}</p>
+      </div>
+    </div>
+    <div class="coach-signals" aria-label="Project signals">
+      ${signals.map((signal) => `<span>${signal}</span>`).join("")}
+    </div>
+  `;
+}
+
+function getCoachAdvice() {
+  if (state.activeEvent) {
+    return {
+      icon: "lightbulb",
+      tone: "warning",
+      title: "Answer the scenario card",
+      body: "Pick a response before changing the board. The project is paused until that decision is made.",
+    };
+  }
+
+  if (state.finished) {
+    return {
+      icon: "trophy",
+      tone: "success",
+      title: "Review the retrospective",
+      body: "Use the scorecard to connect your choices with scope, budget, quality, morale, and trust.",
+    };
+  }
+
+  const reviewTask = state.tasks.find((task) => task.status === "review");
+  if (reviewTask) {
+    return {
+      icon: "eye",
+      tone: "success",
+      title: "Finish review work",
+      body: `${reviewTask.title} is ready to complete. Finishing reviewed work improves quality and unlocks progress.`,
+    };
+  }
+
+  const doingCount = state.tasks.filter((task) => task.status === "doing").length;
+  const doingTask = state.tasks.find((task) => task.status === "doing");
+  if (doingCount >= 3 && doingTask) {
+    return {
+      icon: "alertTriangle",
+      tone: "warning",
+      title: "Limit work in progress",
+      body: `Move ${doingTask.title} to review before starting more tasks so the team does not get stretched.`,
+    };
+  }
+
+  const startableTask = state.tasks.find(
+    (task) =>
+      task.status === "todo" &&
+      task.assignee &&
+      dependenciesDone(task) &&
+      moneyRemaining() >= task.cost,
+  );
+  if (startableTask) {
+    const assignee = memberById(startableTask.assignee);
+    return {
+      icon: "play",
+      tone: "info",
+      title: "Start the assigned task",
+      body: `${startableTask.title} is ready for ${assignee ? assignee.name : "the team"}. Start it when you want to spend the effort and budget.`,
+    };
+  }
+
+  const readyTask = state.tasks.find(
+    (task) => task.status === "todo" && dependenciesDone(task) && moneyRemaining() >= task.cost,
+  );
+  if (readyTask) {
+    const suggested = bestAssigneeForTask(readyTask);
+    return {
+      icon: "users",
+      tone: "info",
+      title: "Assign the next task",
+      body: `${readyTask.title} is unblocked. ${suggested.name} is the best fit right now based on skill and capacity.`,
+    };
+  }
+
+  const blockedTask = state.tasks.find(
+    (task) => task.status === "todo" && !dependenciesDone(task),
+  );
+  if (blockedTask) {
+    const dependency = blockedTask.dependsOn
+      .map((dependencyId) => getTask(dependencyId))
+      .find((task) => task && task.status !== "done");
+    return {
+      icon: "alertTriangle",
+      tone: "warning",
+      title: "Clear a dependency",
+      body: `${blockedTask.title} is waiting on ${dependency ? dependency.title : "another task"}. Finish the prerequisite first.`,
+    };
+  }
+
+  if (moneyRemaining() < 15) {
+    return {
+      icon: "coins",
+      tone: "warning",
+      title: "Protect the remaining budget",
+      body: "Money is tight. Prioritize no-cost work, review risky spending, and avoid optional extras.",
+    };
+  }
+
+  const affordableRisk = scenario.risks.find(
+    (risk) => !hasMitigatedRisk(risk.id) && moneyRemaining() >= risk.cost,
+  );
+  if (affordableRisk) {
+    return {
+      icon: "shieldAlert",
+      tone: "warning",
+      title: "Plan for a likely risk",
+      body: `${affordableRisk.title} can be mitigated before it appears. Risk work costs less when it happens early.`,
+    };
+  }
+
+  return {
+    icon: "target",
+    tone: "info",
+    title: "Advance when the week feels ready",
+    body: "Check capacity, budget, and risks. Then advance the week to see how the project changes.",
+  };
+}
+
+function bestAssigneeForTask(task) {
+  return scenario.team
+    .map((member) => {
+      const skillScore = member.skills.includes(task.skill) ? 10 : 0;
+      const capacityScore = state.teamCapacity[member.id] >= task.effort ? 4 : 0;
+      return { member, score: skillScore + capacityScore + state.teamCapacity[member.id] };
+    })
+    .sort((a, b) => b.score - a.score)[0].member;
+}
+
 function renderTeam() {
   els.teamList.innerHTML = scenario.team
     .map((member) => {
@@ -1038,7 +1189,7 @@ function renderBoard() {
     if (select) {
       select.addEventListener("change", (event) => {
         task.assignee = event.target.value;
-        saveState();
+        render();
       });
     }
     if (button) {
@@ -1302,6 +1453,7 @@ function showEvent(event) {
           <span>
             <strong>${choice.label}</strong>
             <span>${choice.outcome}</span>
+            ${renderEffectChips(choice.effects)}
           </span>
         </button>
       `,
@@ -1313,6 +1465,36 @@ function showEvent(event) {
   });
 
   els.eventDialog.showModal();
+}
+
+function renderEffectChips(effects = {}) {
+  const chips = Object.entries(effects)
+    .filter(([, value]) => value !== 0)
+    .map(([key, value]) => {
+      const effect = formatEffect(key, value);
+      return `<span class="effect-chip ${effect.tone}">${effect.label}</span>`;
+    });
+  return chips.length ? `<span class="effect-row">${chips.join("")}</span>` : "";
+}
+
+function formatEffect(key, value) {
+  if (key === "spent") {
+    return {
+      label: value > 0 ? `-${value} coins` : `+${Math.abs(value)} coins`,
+      tone: value > 0 ? "negative" : "positive",
+    };
+  }
+
+  const labels = {
+    quality: "quality",
+    morale: "morale",
+    trust: "trust",
+  };
+  const label = labels[key] || key;
+  return {
+    label: `${value > 0 ? "+" : ""}${value} ${label}`,
+    tone: value > 0 ? "positive" : "negative",
+  };
 }
 
 function chooseEvent(choiceIndex) {
