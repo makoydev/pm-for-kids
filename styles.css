@@ -525,6 +525,56 @@ h3 {
 .fill.morale { background: linear-gradient(90deg, #fbbf24, var(--warning)); }
 .fill.trust { background: linear-gradient(90deg, #22d3ee, var(--info)); }
 
+.starter-checklist {
+  display: grid;
+  gap: 8px;
+}
+
+.checklist-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-soft);
+}
+
+.checklist-item.done {
+  border-color: #bbf7d0;
+  background: var(--success-soft);
+}
+
+.checklist-status {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.checklist-item.done .checklist-status {
+  background: #dcfce7;
+  color: var(--success);
+}
+
+.checklist-item strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.88rem;
+  line-height: 1.25;
+}
+
+.checklist-item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
 .team-list,
 .risk-list {
   display: grid;

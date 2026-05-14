@@ -630,6 +630,8 @@ const els = {
   weekValue: document.querySelector("#weekValue"),
   weekProgress: document.querySelector("#weekProgress"),
   meters: document.querySelector("#meters"),
+  starterProgress: document.querySelector("#starterProgress"),
+  starterChecklist: document.querySelector("#starterChecklist"),
   teamList: document.querySelector("#teamList"),
   riskList: document.querySelector("#riskList"),
   coachPanel: document.querySelector("#coachPanel"),
@@ -822,6 +824,7 @@ function render() {
 
   renderWeekProgress();
   renderMeters();
+  renderStarterChecklist();
   renderTeam();
   renderRisks();
   renderCoachPanel();
@@ -971,6 +974,67 @@ function renderMeters() {
       `,
     )
     .join("");
+}
+
+function renderStarterChecklist() {
+  if (!els.starterChecklist || !els.starterProgress) return;
+  const items = getStarterChecklistItems();
+  const doneCount = items.filter((item) => item.done).length;
+  els.starterProgress.textContent = `${doneCount}/${items.length} done`;
+  els.starterChecklist.innerHTML = items
+    .map(
+      (item) => `
+        <div class="checklist-item ${item.done ? "done" : ""}">
+          <span class="checklist-status">${icon(item.done ? "checkCircle" : item.icon, { size: "sm" })}</span>
+          <div>
+            <strong>${item.title}</strong>
+            <p>${item.detail}</p>
+          </div>
+        </div>
+      `,
+    )
+    .join("");
+}
+
+function getStarterChecklistItems() {
+  const hasAssignedTask = state.tasks.some((task) => task.assignee);
+  const hasStartedTask = state.tasks.some((task) => task.status !== "todo");
+  const hasMitigatedRisk = state.mitigatedRisks.length > 0;
+  const hasReviewedWork = completedTasks().length > 0;
+  const hasAdvancedWeek = state.week > 1;
+
+  return [
+    {
+      done: hasAssignedTask,
+      icon: "users",
+      title: "Assign a teammate",
+      detail: "Pick someone for an unblocked task so work has a clear owner.",
+    },
+    {
+      done: hasStartedTask,
+      icon: "play",
+      title: "Start one task",
+      detail: "Spend the task budget and capacity when the assignment looks right.",
+    },
+    {
+      done: hasMitigatedRisk,
+      icon: "shieldAlert",
+      title: "Plan for one risk",
+      detail: "Mitigate a risk before the matching scenario card appears.",
+    },
+    {
+      done: hasReviewedWork,
+      icon: "eye",
+      title: "Complete reviewed work",
+      detail: "Move a task through Doing and Review so it counts toward scope.",
+    },
+    {
+      done: hasAdvancedWeek,
+      icon: "arrowRight",
+      title: "Advance the week",
+      detail: "Refresh team capacity and respond to the next project surprise.",
+    },
+  ];
 }
 
 function renderCoachPanel() {
