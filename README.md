@@ -24,4 +24,5 @@ Progress is stored in local browser storage.
 Start with the product plan:
 
 - [Product Plan](docs/product-plan.md)
+- [Feature Checklist](docs/feature-checklist.md)
 - [UX Review Notes](docs/ux-review.md)
