@@ -1571,7 +1571,7 @@ function showEvent(event) {
   els.eventChoices.innerHTML = event.choices
     .map(
       (choice, index) => `
-        <button class="choice-card" type="button" data-choice="${index}">
+        <button class="choice-card" type="button" data-choice="${index}" aria-keyshortcuts="${index + 1}">
           <span class="choice-badge">${index + 1}</span>
           <span>
             <strong>${choice.label}</strong>
@@ -1783,6 +1783,35 @@ function openGlossary() {
   els.glossaryDialog.showModal();
 }
 
+function handleKeyboardShortcuts(event) {
+  if (event.metaKey || event.ctrlKey || event.altKey) return;
+  if (["INPUT", "SELECT", "TEXTAREA"].includes(event.target.tagName)) return;
+
+  if (els.eventDialog.open) {
+    const choiceIndex = Number(event.key) - 1;
+    const choiceButton = els.eventChoices.querySelector(`[data-choice="${choiceIndex}"]`);
+    if (choiceButton) {
+      event.preventDefault();
+      choiceButton.click();
+    }
+    return;
+  }
+
+  if (els.glossaryDialog.open || els.scoreDialog.open) return;
+
+  const key = event.key.toLowerCase();
+  if (key === "g") {
+    event.preventDefault();
+    openGlossary();
+  } else if (key === "a") {
+    event.preventDefault();
+    setActivityCollapsed(!uiPrefs.activityCollapsed);
+  } else if (key === "n" && !els.advanceButton.disabled) {
+    event.preventDefault();
+    advanceWeek();
+  }
+}
+
 function hasProgress() {
   if (state.week > 1 || state.spent > 0 || state.mitigatedRisks.length > 0) return true;
   return state.tasks.some((task) => task.status !== "todo");
@@ -1844,6 +1873,7 @@ els.toggleActivityButton.addEventListener("click", () => {
 els.closeActivityButton.addEventListener("click", () => {
   setActivityCollapsed(true);
 });
+document.addEventListener("keydown", handleKeyboardShortcuts);
 
 hydrateStaticIcons();
 applyActivityCollapsed();
