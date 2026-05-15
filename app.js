@@ -3,6 +3,7 @@ const UI_PREFS_KEY = "pm-for-kids-ui-v1";
 
 const ICONS = {
   briefcase: `<path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 13h20"/>`,
+  bookOpen: `<path d="M12 7v14"/><path d="M3 18a2 2 0 0 0 2 2h7V5H5a2 2 0 0 0-2 2z"/><path d="M21 18a2 2 0 0 1-2 2h-7V5h7a2 2 0 0 1 2 2z"/>`,
   sparkles: `<path d="M12 3 10.5 8.5 5 10l5.5 1.5L12 17l1.5-5.5L19 10l-5.5-1.5z"/><path d="M5 4v2"/><path d="M19 16v2"/><path d="M4 5h2"/><path d="M18 17h2"/>`,
   refresh: `<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v5h-5"/>`,
   flag: `<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>`,
@@ -56,6 +57,44 @@ const COLUMN_THEMES = {
   review: { icon: "eye", label: "Review" },
   done: { icon: "checkCircle", label: "Done" },
 };
+
+const GLOSSARY_TERMS = [
+  {
+    term: "Scope",
+    definition: "The work the project promises to finish.",
+    example: "For the booth, scope includes the filter, poster, practice, and cleanup.",
+  },
+  {
+    term: "Risk",
+    definition: "Something that might happen and make the project harder.",
+    example: "Late supplies are a risk because they can slow down building.",
+  },
+  {
+    term: "Dependency",
+    definition: "Work that must be finished before another task can start.",
+    example: "The team needs test results before practicing the final presentation.",
+  },
+  {
+    term: "Stakeholder",
+    definition: "A person who cares about the project result.",
+    example: "The sponsor, judge, teammates, and audience are stakeholders.",
+  },
+  {
+    term: "Quality",
+    definition: "How well the project works and how easy it is to understand.",
+    example: "A clear chart and a leak-free filter improve quality.",
+  },
+  {
+    term: "Budget",
+    definition: "The money available for project choices.",
+    example: "Coins spent on supplies leave fewer coins for surprises.",
+  },
+  {
+    term: "Morale",
+    definition: "How the team feels while doing the work.",
+    example: "Too much overtime can lower morale, even when tasks move faster.",
+  },
+];
 
 function hydrateStaticIcons() {
   document.querySelectorAll("[data-icon]").forEach((node) => {
@@ -644,6 +683,10 @@ const els = {
   finishButton: document.querySelector("#finishButton"),
   resetButton: document.querySelector("#resetButton"),
   clearLogButton: document.querySelector("#clearLogButton"),
+  glossaryButton: document.querySelector("#glossaryButton"),
+  glossaryDialog: document.querySelector("#glossaryDialog"),
+  glossaryContent: document.querySelector("#glossaryContent"),
+  closeGlossaryButton: document.querySelector("#closeGlossaryButton"),
   eventDialog: document.querySelector("#eventDialog"),
   eventType: document.querySelector("#eventType"),
   eventTitle: document.querySelector("#eventTitle"),
@@ -1683,6 +1726,23 @@ function renderLog() {
   els.activityLog.innerHTML = state.log.map((item) => `<li>${item}</li>`).join("");
 }
 
+function renderGlossary() {
+  els.glossaryContent.innerHTML = GLOSSARY_TERMS.map(
+    (item) => `
+      <article class="glossary-card">
+        <strong>${item.term}</strong>
+        <p>${item.definition}</p>
+        <span>${item.example}</span>
+      </article>
+    `,
+  ).join("");
+}
+
+function openGlossary() {
+  renderGlossary();
+  els.glossaryDialog.showModal();
+}
+
 function hasProgress() {
   if (state.week > 1 || state.spent > 0 || state.mitigatedRisks.length > 0) return true;
   return state.tasks.some((task) => task.status !== "todo");
@@ -1731,6 +1791,8 @@ els.clearLogButton.addEventListener("click", () => {
   state.log = [];
   render();
 });
+els.glossaryButton.addEventListener("click", openGlossary);
+els.closeGlossaryButton.addEventListener("click", () => els.glossaryDialog.close());
 els.toggleActivityButton.addEventListener("click", () => {
   setActivityCollapsed(!uiPrefs.activityCollapsed);
 });

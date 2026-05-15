@@ -16,6 +16,9 @@
         </div>
       </div>
       <div class="top-actions">
+        <button id="glossaryButton" class="button secondary" type="button" aria-haspopup="dialog">
+          <span data-icon="bookOpen" aria-hidden="true"></span>Glossary
+        </button>
         <button id="toggleActivityButton" class="button secondary" type="button" aria-pressed="false" aria-controls="activityPanel">
           <span data-icon="scroll" aria-hidden="true"></span><span class="toggle-label">Show Activity</span>
         </button>
@@ -138,6 +141,17 @@
       </div>
       <p id="eventBody" class="dialog-copy"></p>
       <div id="eventChoices" class="choice-list"></div>
+    </dialog>
+
+    <dialog id="glossaryDialog" class="dialog wide">
+      <div class="dialog-header">
+        <p class="eyebrow"><span data-icon="bookOpen" aria-hidden="true"></span>PM words</p>
+        <h2>Glossary</h2>
+      </div>
+      <div id="glossaryContent" class="glossary-grid"></div>
+      <div class="dialog-actions">
+        <button id="closeGlossaryButton" class="button primary" type="button">Done</button>
+      </div>
     </dialog>
 
     <dialog id="scoreDialog" class="dialog wide">
