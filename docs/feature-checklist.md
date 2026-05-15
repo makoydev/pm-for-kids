@@ -14,12 +14,12 @@ This checklist tracks the next features for PM for Kids. The goal is to keep eac
 - [x] Glossary panel for PM terms.
   - Acceptance: players can open plain-language definitions for scope, risk, dependency, stakeholder, quality, budget, and morale.
   - Learning goal: connect game actions to project management vocabulary.
+- [x] Difficulty levels.
+  - Acceptance: easy mode shows full effect previews; challenge mode hides exact numbers and uses softer hints.
+  - Learning goal: support younger learners while leaving room for replayability.
 
 ## Next
 
-- [ ] Difficulty levels.
-  - Acceptance: easy mode shows full effect previews; challenge mode hides exact numbers and uses softer hints.
-  - Learning goal: support younger learners while leaving room for replayability.
 - [ ] Keyboard support pass.
   - Acceptance: primary controls are reachable and usable by keyboard, including dialogs and task actions.
   - Learning goal: improve accessibility and classroom usability.
