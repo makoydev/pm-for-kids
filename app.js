@@ -699,16 +699,18 @@ const els = {
   appShell: document.querySelector(".app-shell"),
   toggleActivityButton: document.querySelector("#toggleActivityButton"),
   closeActivityButton: document.querySelector("#closeActivityButton"),
+  difficultyButtons: document.querySelectorAll("[data-difficulty]"),
 };
 
 function loadUIPrefs() {
   try {
     const raw = window.localStorage.getItem(UI_PREFS_KEY);
-    if (!raw) return { activityCollapsed: true };
+    if (!raw) return { activityCollapsed: true, difficulty: "easy" };
     const parsed = JSON.parse(raw);
-    return { activityCollapsed: parsed.activityCollapsed !== false };
+    const difficulty = parsed.difficulty === "challenge" ? "challenge" : "easy";
+    return { activityCollapsed: parsed.activityCollapsed !== false, difficulty };
   } catch {
-    return { activityCollapsed: true };
+    return { activityCollapsed: true, difficulty: "easy" };
   }
 }
 
@@ -734,6 +736,20 @@ function setActivityCollapsed(collapsed) {
   uiPrefs.activityCollapsed = collapsed;
   saveUIPrefs();
   applyActivityCollapsed();
+}
+
+function applyDifficultyMode() {
+  els.difficultyButtons.forEach((button) => {
+    const selected = button.dataset.difficulty === uiPrefs.difficulty;
+    button.classList.toggle("active", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+}
+
+function setDifficultyMode(difficulty) {
+  uiPrefs.difficulty = difficulty === "challenge" ? "challenge" : "easy";
+  saveUIPrefs();
+  applyDifficultyMode();
 }
 
 function createInitialState() {
@@ -1585,6 +1601,10 @@ function renderEffectChips(effects = {}) {
 }
 
 function formatEffect(key, value) {
+  if (uiPrefs.difficulty === "challenge") {
+    return formatChallengeEffect(key, value);
+  }
+
   if (key === "spent") {
     return {
       label: value > 0 ? `-${value} coins` : `+${Math.abs(value)} coins`,
@@ -1600,6 +1620,26 @@ function formatEffect(key, value) {
   const label = labels[key] || key;
   return {
     label: `${value > 0 ? "+" : ""}${value} ${label}`,
+    tone: value > 0 ? "positive" : "negative",
+  };
+}
+
+function formatChallengeEffect(key, value) {
+  if (key === "spent") {
+    return {
+      label: value > 0 ? "costs coins" : "saves coins",
+      tone: value > 0 ? "negative" : "positive",
+    };
+  }
+
+  const labels = {
+    quality: "quality",
+    morale: "morale",
+    trust: "trust",
+  };
+  const label = labels[key] || key;
+  return {
+    label: value > 0 ? `helps ${label}` : `hurts ${label}`,
     tone: value > 0 ? "positive" : "negative",
   };
 }
@@ -1793,6 +1833,11 @@ els.clearLogButton.addEventListener("click", () => {
 });
 els.glossaryButton.addEventListener("click", openGlossary);
 els.closeGlossaryButton.addEventListener("click", () => els.glossaryDialog.close());
+els.difficultyButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setDifficultyMode(button.dataset.difficulty);
+  });
+});
 els.toggleActivityButton.addEventListener("click", () => {
   setActivityCollapsed(!uiPrefs.activityCollapsed);
 });
@@ -1802,6 +1847,7 @@ els.closeActivityButton.addEventListener("click", () => {
 
 hydrateStaticIcons();
 applyActivityCollapsed();
+applyDifficultyMode();
 render();
 
 if (state.activeEvent) {

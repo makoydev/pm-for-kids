@@ -416,6 +416,38 @@ h3 {
   color: var(--primary-dark);
 }
 
+.difficulty-toggle {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-height: 40px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-strong);
+}
+
+.mode-button {
+  min-width: 82px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 0.84rem;
+}
+
+.mode-button.active,
+.mode-button[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-sm);
+}
+
+.mode-button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .panel-heading {
   display: flex;
   align-items: center;
@@ -1415,6 +1447,7 @@ h3 {
   }
 
   .top-actions .button,
+  .difficulty-toggle,
   .week-panel .button {
     width: 100%;
   }
