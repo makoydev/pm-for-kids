@@ -1,7 +1,6 @@
 import type {
   Difficulty,
   Effects,
-  EventChoice,
   GameState,
   ProjectTask,
   Scenario,
