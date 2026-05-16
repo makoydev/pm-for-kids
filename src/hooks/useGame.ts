@@ -52,6 +52,10 @@ export function useGame() {
   const [scoreOpen, setScoreOpen] = useState(() => loadGameState().finished);
   const [glossaryOpen, setGlossaryOpen] = useState(false);
 
+  const toggleActivity = useCallback(() => {
+    setUIPrefs((current) => ({ ...current, activityCollapsed: !current.activityCollapsed }));
+  }, []);
+
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ scenarioId: scenario.id, state }));
     window.localStorage.removeItem(LEGACY_STORAGE_KEY);
@@ -93,14 +97,10 @@ export function useGame() {
 
     document.addEventListener("keydown", handleKeyboardShortcuts);
     return () => document.removeEventListener("keydown", handleKeyboardShortcuts);
-  }, [glossaryOpen, scoreOpen, state.activeEvent, state.finished]);
+  }, [glossaryOpen, scoreOpen, state.activeEvent, state.finished, toggleActivity]);
 
   const setDifficulty = useCallback((difficulty: Difficulty) => {
     setUIPrefs((current) => ({ ...current, difficulty }));
-  }, []);
-
-  const toggleActivity = useCallback(() => {
-    setUIPrefs((current) => ({ ...current, activityCollapsed: !current.activityCollapsed }));
   }, []);
 
   const actions = useMemo(

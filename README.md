@@ -2,11 +2,18 @@
 
 A web app concept for teaching project management to kids through short, game-like project simulations.
 
-## Current Prototype
+## Current App
 
-The first static prototype is playable in the browser:
+The app is now a Vite + React + TypeScript project:
 
-- Open `index.html` directly, or serve the folder with any static web server.
+- Run `npm install`.
+- Run `npm run dev` for local development.
+- Run `npm run build` for a production build.
+- Run `npm test` for unit and component tests.
+- Run `npm run lint` for static checks.
+
+The playable project simulation lets kids:
+
 - Manage the School Science Fair Booth project.
 - Move tasks through `Todo`, `Doing`, `Review`, and `Done`.
 - Assign teammates based on capacity and skills.
@@ -18,6 +25,15 @@ The first static prototype is playable in the browser:
 - Finish the project to see a scorecard and retrospective.
 
 Progress is stored in local browser storage.
+
+## Project Structure
+
+- `src/App.tsx` wires the app shell and top-level interactions.
+- `src/components/` contains React UI components.
+- `src/data/` contains typed scenario and glossary content.
+- `src/game/` contains domain types and pure game rules.
+- `src/hooks/` contains React state and persistence hooks.
+- `src/test/` contains shared test setup.
 
 ## Documentation
 
