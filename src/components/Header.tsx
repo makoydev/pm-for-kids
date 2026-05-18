@@ -1,11 +1,15 @@
 import type { Difficulty } from "../game/types";
+import type { Scenario } from "../game/types";
 import { Icon } from "./Icon";
 
 interface HeaderProps {
   difficulty: Difficulty;
   activityCollapsed: boolean;
   finished: boolean;
+  scenarios: Scenario[];
+  activeScenarioId: string;
   onDifficultyChange: (difficulty: Difficulty) => void;
+  onScenarioChange: (scenarioId: string) => void;
   onToggleActivity: () => void;
   onOpenGlossary: () => void;
   onReset: () => void;
@@ -16,7 +20,10 @@ export function Header({
   difficulty,
   activityCollapsed,
   finished,
+  scenarios,
+  activeScenarioId,
   onDifficultyChange,
+  onScenarioChange,
   onToggleActivity,
   onOpenGlossary,
   onReset,
@@ -47,6 +54,16 @@ export function Header({
           <Icon name="bookOpen" />
           Glossary
         </button>
+        <label className="scenario-picker">
+          <span>Project</span>
+          <select value={activeScenarioId} onChange={(event) => onScenarioChange(event.target.value)}>
+            {scenarios.map((scenario) => (
+              <option value={scenario.id} key={scenario.id}>
+                {scenario.title}
+              </option>
+            ))}
+          </select>
+        </label>
         <div className="difficulty-toggle" aria-label="Difficulty">
           {(["easy", "challenge"] as const).map((mode) => (
             <button

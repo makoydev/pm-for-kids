@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { scenario } from "../data/scenario";
+import { scenarios } from "../data/scenario";
 import {
   advanceTask,
   advanceWeek,
@@ -17,18 +17,33 @@ const STORAGE_KEY = "pm-for-kids-state-v2";
 const LEGACY_STORAGE_KEY = "pm-for-kids-state-v1";
 const UI_PREFS_KEY = "pm-for-kids-ui-v2";
 
-function loadGameState() {
+const defaultScenario = scenarios[0];
+
+function scenarioById(scenarioId: string | undefined) {
+  return scenarios.find((candidate) => candidate.id === scenarioId) ?? defaultScenario;
+}
+
+function loadSavedGame() {
   const saved = window.localStorage.getItem(STORAGE_KEY);
-  if (!saved) return createInitialState(scenario);
+  if (!saved) {
+    return {
+      scenario: defaultScenario,
+      state: createInitialState(defaultScenario),
+    };
+  }
 
   try {
     const parsed = JSON.parse(saved) as { scenarioId?: string; state?: Partial<GameState> };
-    if (!parsed || parsed.scenarioId !== scenario.id || !parsed.state) {
-      return createInitialState(scenario);
-    }
-    return normalizeState(scenario, parsed.state);
+    const scenario = scenarioById(parsed.scenarioId);
+    return {
+      scenario,
+      state: parsed.state ? normalizeState(scenario, parsed.state) : createInitialState(scenario),
+    };
   } catch {
-    return createInitialState(scenario);
+    return {
+      scenario: defaultScenario,
+      state: createInitialState(defaultScenario),
+    };
   }
 }
 
@@ -47,9 +62,11 @@ function loadUIPrefs(): UIPrefs {
 }
 
 export function useGame() {
-  const [state, setState] = useState(loadGameState);
+  const [activeScenarioId, setActiveScenarioId] = useState(() => loadSavedGame().scenario.id);
+  const scenario = scenarioById(activeScenarioId);
+  const [state, setState] = useState(() => loadSavedGame().state);
   const [uiPrefs, setUIPrefs] = useState(loadUIPrefs);
-  const [scoreOpen, setScoreOpen] = useState(() => loadGameState().finished);
+  const [scoreOpen, setScoreOpen] = useState(() => loadSavedGame().state.finished);
   const [glossaryOpen, setGlossaryOpen] = useState(false);
 
   const toggleActivity = useCallback(() => {
@@ -59,7 +76,7 @@ export function useGame() {
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ scenarioId: scenario.id, state }));
     window.localStorage.removeItem(LEGACY_STORAGE_KEY);
-  }, [state]);
+  }, [scenario.id, state]);
 
   useEffect(() => {
     window.localStorage.setItem(UI_PREFS_KEY, JSON.stringify(uiPrefs));
@@ -97,10 +114,17 @@ export function useGame() {
 
     document.addEventListener("keydown", handleKeyboardShortcuts);
     return () => document.removeEventListener("keydown", handleKeyboardShortcuts);
-  }, [glossaryOpen, scoreOpen, state.activeEvent, state.finished, toggleActivity]);
+  }, [glossaryOpen, scenario, scoreOpen, state.activeEvent, state.finished, toggleActivity]);
 
   const setDifficulty = useCallback((difficulty: Difficulty) => {
     setUIPrefs((current) => ({ ...current, difficulty }));
+  }, []);
+
+  const selectScenario = useCallback((scenarioId: string) => {
+    const nextScenario = scenarioById(scenarioId);
+    setActiveScenarioId(nextScenario.id);
+    setState(createInitialState(nextScenario));
+    setScoreOpen(false);
   }, []);
 
   const actions = useMemo(
@@ -132,7 +156,7 @@ export function useGame() {
         setState((current) => ({ ...current, log: [] }));
       },
     }),
-    [],
+    [scenario],
   );
 
   useEffect(() => {
@@ -141,6 +165,7 @@ export function useGame() {
 
   return {
     scenario,
+    scenarios,
     state,
     uiPrefs,
     scoreOpen,
@@ -149,6 +174,7 @@ export function useGame() {
     setScoreOpen,
     setGlossaryOpen,
     setDifficulty,
+    selectScenario,
     toggleActivity,
     setActivityCollapsed: (activityCollapsed: boolean) =>
       setUIPrefs((current) => ({ ...current, activityCollapsed })),

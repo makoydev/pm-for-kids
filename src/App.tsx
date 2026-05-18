@@ -40,7 +40,10 @@ export function App() {
         difficulty={game.uiPrefs.difficulty}
         activityCollapsed={game.uiPrefs.activityCollapsed}
         finished={game.state.finished}
+        scenarios={game.scenarios}
+        activeScenarioId={game.scenario.id}
         onDifficultyChange={game.setDifficulty}
+        onScenarioChange={game.selectScenario}
         onToggleActivity={game.toggleActivity}
         onOpenGlossary={() => game.setGlossaryOpen(true)}
         onReset={handleReset}
