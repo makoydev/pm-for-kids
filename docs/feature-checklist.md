@@ -20,13 +20,11 @@ This checklist tracks the next features for PM for Kids. The goal is to keep eac
 - [x] Keyboard support pass.
   - Acceptance: primary controls are reachable and usable by keyboard, including dialogs and task actions.
   - Learning goal: improve accessibility and classroom usability.
-
-## Next
-
-- [ ] More project scenarios, starting with a birthday party, class garden, robot demo, or bake sale.
-- [ ] Scenario data extraction into JSON so new projects can be authored without editing app logic.
+- [x] More project scenarios, starting with a birthday party, class garden, robot demo, or bake sale.
+- [x] Scenario data extraction into JSON so new projects can be authored without editing app logic.
 
 ## Later
 
+- [ ] Add a class garden, robot demo, or bake sale scenario.
 - [ ] Parent or teacher summary with discussion prompts after the retrospective.
 - [ ] Replay settings for event randomness and optional risk frequency.

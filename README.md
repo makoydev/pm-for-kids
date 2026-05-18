@@ -15,6 +15,7 @@ The app is now a Vite + React + TypeScript project:
 The playable project simulation lets kids:
 
 - Manage the School Science Fair Booth project.
+- Switch between JSON-authored project scenarios, including the Birthday Party Plan.
 - Move tasks through `Todo`, `Doing`, `Review`, and `Done`.
 - Assign teammates based on capacity and skills.
 - Mitigate risks before matching scenario cards appear.
@@ -31,6 +32,7 @@ Progress is stored in local browser storage.
 - `src/App.tsx` wires the app shell and top-level interactions.
 - `src/components/` contains React UI components.
 - `src/data/` contains typed scenario and glossary content.
+- `src/data/scenarios/` contains JSON scenario files.
 - `src/game/` contains domain types and pure game rules.
 - `src/hooks/` contains React state and persistence hooks.
 - `src/test/` contains shared test setup.
