@@ -311,13 +311,10 @@ export function scoreProject(scenario: Scenario, state: GameState): ScoreSummary
   const done = completedTasks(state).length;
   const scope = Math.round((done / state.tasks.length) * 100);
   const budget = moneyRemaining(scenario, state);
-  const deliveredCore = ["test-prototype", "make-poster", "practice-talk"].every(
-    (taskId) => getTask(state, taskId)?.status === "done",
-  );
   const deadlineText = done === state.tasks.length ? "All tasks done" : `${done}/${state.tasks.length} tasks done`;
   const outcome =
-    deliveredCore && budget >= 0 && state.quality >= 65
-      ? "The booth is ready for the science fair."
+    scope >= 80 && budget >= 0 && state.quality >= 65
+      ? `${scenario.title} is ready to share.`
       : "The project has useful progress, but the retrospective shows what to improve next time.";
   const lessons = state.lessons.length
     ? state.lessons

@@ -26,4 +26,14 @@ describe("App", () => {
     expect(screen.getByRole("dialog", { name: "Glossary" })).toBeInTheDocument();
     expect(screen.getByText("The work the project promises to finish.")).toBeInTheDocument();
   });
+
+  it("switches between JSON-backed scenarios", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.selectOptions(screen.getByRole("combobox", { name: "Project" }), "birthday-party");
+
+    expect(screen.getByRole("heading", { name: "Birthday Party Plan" })).toBeInTheDocument();
+    expect(screen.getByText("Pick party theme")).toBeInTheDocument();
+  });
 });

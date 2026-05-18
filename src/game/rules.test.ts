@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { scenario } from "../data/scenario";
+import { scenarios } from "../data/scenario";
 import {
   advanceTask,
   advanceWeek,
@@ -47,5 +48,10 @@ describe("game rules", () => {
     expect(state.trust).toBe(81);
     expect(state.quality).toBe(49);
     expect(moneyRemaining(scenario, state)).toBe(92);
+  });
+
+  it("loads multiple JSON-backed scenarios", () => {
+    expect(scenarios.map((item) => item.id)).toEqual(["science-fair-booth", "birthday-party"]);
+    expect(scenarios[1].tasks.some((task) => task.id === "pick-theme")).toBe(true);
   });
 });

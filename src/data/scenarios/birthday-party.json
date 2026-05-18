@@ -1,0 +1,244 @@
+{
+  "id": "birthday-party",
+  "title": "Birthday Party Plan",
+  "goal": "Plan a fun backyard birthday party before guests arrive on Saturday.",
+  "deadlineWeeks": 3,
+  "budget": 80,
+  "team": [
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Designer",
+      "skills": ["design", "plan"],
+      "capacity": 4
+    },
+    {
+      "id": "leo",
+      "name": "Leo",
+      "role": "Builder",
+      "skills": ["build", "test"],
+      "capacity": 4
+    },
+    {
+      "id": "nora",
+      "name": "Nora",
+      "role": "Researcher",
+      "skills": ["research", "present"],
+      "capacity": 3
+    }
+  ],
+  "tasks": [
+    {
+      "id": "pick-theme",
+      "title": "Pick party theme",
+      "effort": 1,
+      "cost": 0,
+      "skill": "plan",
+      "dependsOn": [],
+      "qualityImpact": 8
+    },
+    {
+      "id": "guest-list",
+      "title": "Make guest list",
+      "effort": 1,
+      "cost": 0,
+      "skill": "plan",
+      "dependsOn": ["pick-theme"],
+      "qualityImpact": 8
+    },
+    {
+      "id": "send-invites",
+      "title": "Send invitations",
+      "effort": 2,
+      "cost": 4,
+      "skill": "present",
+      "dependsOn": ["guest-list"],
+      "qualityImpact": 10
+    },
+    {
+      "id": "buy-snacks",
+      "title": "Buy snacks and drinks",
+      "effort": 1,
+      "cost": 28,
+      "skill": "research",
+      "dependsOn": ["guest-list"],
+      "qualityImpact": 12
+    },
+    {
+      "id": "decorate-yard",
+      "title": "Decorate the yard",
+      "effort": 2,
+      "cost": 16,
+      "skill": "design",
+      "dependsOn": ["pick-theme"],
+      "qualityImpact": 14
+    },
+    {
+      "id": "set-games",
+      "title": "Set up party games",
+      "effort": 2,
+      "cost": 8,
+      "skill": "build",
+      "dependsOn": ["decorate-yard"],
+      "qualityImpact": 14
+    },
+    {
+      "id": "music-playlist",
+      "title": "Make music playlist",
+      "effort": 1,
+      "cost": 0,
+      "skill": "design",
+      "dependsOn": ["pick-theme"],
+      "qualityImpact": 8
+    },
+    {
+      "id": "weather-backup",
+      "title": "Prepare indoor backup plan",
+      "effort": 1,
+      "cost": 6,
+      "skill": "plan",
+      "dependsOn": ["guest-list"],
+      "qualityImpact": 10
+    }
+  ],
+  "risks": [
+    {
+      "id": "rain-backup",
+      "title": "Rain might move the party inside",
+      "description": "Plan an indoor game layout before the forecast changes.",
+      "eventId": "rain-forecast",
+      "cost": 5,
+      "response": {
+        "label": "Indoor plan ready",
+        "outcome": "The backup layout made the rain forecast much less stressful.",
+        "effects": { "morale": 5, "trust": 5 }
+      }
+    },
+    {
+      "id": "snack-check",
+      "title": "Snacks might not fit every guest",
+      "description": "Check allergies and favorite snacks before shopping.",
+      "eventId": "snack-issue",
+      "cost": 4,
+      "response": {
+        "label": "Snack check used",
+        "outcome": "The snack list helped avoid last-minute food problems.",
+        "effects": { "quality": 6, "trust": 4 }
+      }
+    },
+    {
+      "id": "helper-plan",
+      "title": "A helper might be late",
+      "description": "Share the setup plan so another teammate can cover.",
+      "eventId": "helper-late",
+      "cost": 4,
+      "response": {
+        "label": "Setup plan shared",
+        "outcome": "The team covered the late helper without panic.",
+        "effects": { "morale": 6, "trust": 3 }
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "rain-forecast",
+      "title": "Rain is in the forecast",
+      "body": "The party is planned for the backyard, but rain may arrive during game time.",
+      "choices": [
+        {
+          "label": "Move games under cover",
+          "outcome": "The party stays fun, but the team uses time rearranging the space.",
+          "lesson": "Risk responses work best when they protect the main goal.",
+          "effects": { "quality": 8, "morale": 2 }
+        },
+        {
+          "label": "Hope the rain misses",
+          "outcome": "Nothing changes now, but guests may be uncomfortable later.",
+          "lesson": "Hope is not a plan when people are depending on you.",
+          "effects": { "trust": -8, "quality": -5 }
+        },
+        {
+          "label": "Cancel the games",
+          "outcome": "The schedule gets simpler, but the party feels less exciting.",
+          "lesson": "Cut scope carefully so the project still meets its goal.",
+          "effects": { "quality": -8, "morale": 2 }
+        }
+      ]
+    },
+    {
+      "id": "snack-issue",
+      "title": "A guest cannot eat the planned snacks",
+      "body": "One guest has a food allergy. The snack table needs a safer option.",
+      "choices": [
+        {
+          "label": "Buy one safe snack option",
+          "outcome": "The guest feels included and the budget takes a small hit.",
+          "lesson": "Quality includes making the result work for real users.",
+          "effects": { "spent": 6, "trust": 8, "quality": 5 }
+        },
+        {
+          "label": "Label the snacks clearly",
+          "outcome": "Guests can choose safely, but the snack table is still limited.",
+          "lesson": "Clear communication reduces risk even when you cannot fix everything.",
+          "effects": { "trust": 5, "quality": 2 }
+        },
+        {
+          "label": "Ignore it because shopping is done",
+          "outcome": "The plan stays cheap, but trust drops.",
+          "lesson": "Ignoring stakeholder needs can make a project feel unsuccessful.",
+          "effects": { "trust": -10, "quality": -6 }
+        }
+      ]
+    },
+    {
+      "id": "helper-late",
+      "title": "A helper is running late",
+      "body": "The games need setup, but one helper cannot arrive until later.",
+      "choices": [
+        {
+          "label": "Reassign the must-have setup",
+          "outcome": "The team protects the important work and leaves extras for later.",
+          "lesson": "Prioritization helps when capacity changes.",
+          "effects": { "morale": 5, "trust": 4 }
+        },
+        {
+          "label": "Ask everyone to rush",
+          "outcome": "More work gets done, but the team feels pressured.",
+          "lesson": "Speed can create hidden quality and morale costs.",
+          "effects": { "morale": -8, "quality": -3 }
+        },
+        {
+          "label": "Skip setup checks",
+          "outcome": "The party starts sooner, but a game may not work well.",
+          "lesson": "Skipping validation can move problems to the customer.",
+          "effects": { "quality": -9, "trust": -2 }
+        }
+      ]
+    },
+    {
+      "id": "guest-count-change",
+      "title": "Two extra guests RSVP",
+      "body": "The guest count changed after snacks and games were planned.",
+      "choices": [
+        {
+          "label": "Check budget and adjust snacks",
+          "outcome": "The plan changes in a controlled way.",
+          "lesson": "Scope changes need budget and capacity checks.",
+          "effects": { "spent": 5, "trust": 6 }
+        },
+        {
+          "label": "Add everything immediately",
+          "outcome": "The extra guests are covered, but the team loses focus.",
+          "lesson": "Saying yes without tradeoffs can overload the plan.",
+          "effects": { "spent": 10, "morale": -5, "quality": 2 }
+        },
+        {
+          "label": "Do nothing",
+          "outcome": "The team saves money, but the party may feel short on supplies.",
+          "lesson": "A changed requirement still needs a decision.",
+          "effects": { "trust": -5, "quality": -5 }
+        }
+      ]
+    }
+  ]
+}
