@@ -133,6 +133,16 @@ export function ScoreModal({ open, scenario, state, onPlayAgain, onClose }: Scor
               </li>
             ))}
           </ol>
+          <section className="mentor-summary" aria-labelledby="mentor-summary-title">
+            <h3 id="mentor-summary-title">Parent and teacher notes</h3>
+            <p>{score.mentorSummary.headline}</p>
+            <ul>
+              {score.mentorSummary.talkingPoints.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ul>
+            <strong>{score.mentorSummary.challenge}</strong>
+          </section>
         </div>
         <div className="dialog-actions">
           <button className="button primary" type="button" onClick={onPlayAgain}>

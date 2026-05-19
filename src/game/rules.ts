@@ -337,6 +337,7 @@ export function scoreProject(scenario: Scenario, state: GameState): ScoreSummary
       },
     ],
     retrospective: [bestResult(state, scope, budget), riskResult(scenario, state), lessons[0]],
+    mentorSummary: mentorSummary(scenario, state, scope, budget),
   };
 }
 
@@ -351,6 +352,41 @@ function riskResult(scenario: Scenario, state: GameState) {
   if (state.quality < 60) return "Biggest risk: quality needed more review and testing.";
   if (moneyRemaining(scenario, state) < 10) return "Biggest risk: the budget had very little safety room.";
   return "Biggest risk handled: you kept the main project constraints balanced.";
+}
+
+function mentorSummary(scenario: Scenario, state: GameState, scope: number, budget: number) {
+  const talkingPoints = [
+    `Ask which tradeoff mattered most in ${scenario.title}: scope, budget, quality, morale, or trust.`,
+    `Review one decision that improved the project and one decision the player would change next time.`,
+  ];
+
+  if (state.mitigatedRisks.length > 0) {
+    talkingPoints.push("Point out how planning for a risk before it happened changed the outcome.");
+  } else {
+    talkingPoints.push("Ask which risk the player would plan for earlier on a replay.");
+  }
+
+  if (state.morale < 60) {
+    talkingPoints.push("Discuss how team pressure affected delivery and quality.");
+  } else if (state.trust < 60) {
+    talkingPoints.push("Discuss why stakeholder updates matter before surprises become bigger problems.");
+  } else {
+    talkingPoints.push("Connect the final result to the planning habits that kept the project healthy.");
+  }
+
+  const headline =
+    scope >= 80 && budget >= 0
+      ? "The player delivered a strong project while managing constraints."
+      : "The player practiced project decisions and has clear replay opportunities.";
+
+  const challenge =
+    budget < 10
+      ? "Replay challenge: finish with at least 10 coins left."
+      : scope < 80
+        ? "Replay challenge: finish at least 80% of the scope before ending the project."
+        : "Replay challenge: protect quality and morale while finishing the project.";
+
+  return { headline, talkingPoints, challenge };
 }
 
 export function formatEffect(key: keyof Effects, value: number, difficulty: Difficulty) {

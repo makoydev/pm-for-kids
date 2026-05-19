@@ -101,4 +101,9 @@ export interface ScoreSummary {
   outcome: string;
   scoreCards: ScoreCard[];
   retrospective: string[];
+  mentorSummary: {
+    headline: string;
+    talkingPoints: string[];
+    challenge: string;
+  };
 }

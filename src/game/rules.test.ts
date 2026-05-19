@@ -9,8 +9,10 @@ import {
   chooseEvent,
   completedTasks,
   createInitialState,
+  finishProject,
   mitigateRisk,
   moneyRemaining,
+  scoreProject,
 } from "./rules";
 
 describe("game rules", () => {
@@ -58,5 +60,14 @@ describe("game rules", () => {
     ]);
     expect(scenarios[1].tasks.some((task) => task.id === "pick-theme")).toBe(true);
     expect(scenarios[2].tasks.some((task) => task.id === "choose-location")).toBe(true);
+  });
+
+  it("includes mentor discussion notes in the score summary", () => {
+    const state = finishProject(createInitialState(scenario));
+    const score = scoreProject(scenario, state);
+
+    expect(score.mentorSummary.headline).toContain("project decisions");
+    expect(score.mentorSummary.talkingPoints.length).toBeGreaterThanOrEqual(3);
+    expect(score.mentorSummary.challenge).toContain("Replay challenge");
   });
 });

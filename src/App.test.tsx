@@ -1,12 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "./App";
 
 describe("App", () => {
   beforeEach(() => {
     window.localStorage.clear();
+    vi.restoreAllMocks();
   });
 
   it("renders the project board and starter checklist", () => {
@@ -45,5 +46,16 @@ describe("App", () => {
 
     expect(screen.getByRole("heading", { name: "Class Garden Build" })).toBeInTheDocument();
     expect(screen.getByText("Choose garden location")).toBeInTheDocument();
+  });
+
+  it("shows parent and teacher notes in the scorecard", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: /finish project/i }));
+
+    expect(screen.getByRole("heading", { name: "Parent and teacher notes" })).toBeInTheDocument();
+    expect(screen.getByText(/Replay challenge/i)).toBeInTheDocument();
   });
 });
