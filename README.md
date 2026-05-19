@@ -24,6 +24,7 @@ The playable project simulation lets kids:
 - Compare scenario choice tradeoffs with effect chips before deciding.
 - Advance weeks and respond to PM scenario cards.
 - Finish the project to see a scorecard and retrospective.
+- Use the parent/teacher notes after a run for discussion prompts and a replay challenge.
 
 Progress is stored in local browser storage.
 
