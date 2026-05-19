@@ -1,5 +1,7 @@
 import type {
   Difficulty,
+  EventFrequency,
+  EventOrder,
   Effects,
   GameState,
   ProjectTask,
@@ -240,7 +242,7 @@ function updateTask(state: GameState, taskId: string, updates: Partial<ProjectTa
 export function advanceWeek(
   scenario: Scenario,
   state: GameState,
-  eventPicker: (availableEvents: ScenarioEvent[]) => ScenarioEvent | null = pickRandomEvent,
+  eventPicker: (availableEvents: ScenarioEvent[], nextState: GameState) => ScenarioEvent | null = pickRandomEvent,
 ): GameState {
   if (state.finished || state.activeEvent) return state;
   if (state.week >= scenario.deadlineWeeks) return finishProject(state);
@@ -261,7 +263,10 @@ export function advanceWeek(
     );
   }
 
-  const event = eventPicker(scenario.events.filter((item) => !state.usedEvents.includes(item.id)));
+  const event = eventPicker(
+    scenario.events.filter((item) => !state.usedEvents.includes(item.id)),
+    nextState,
+  );
   if (event) nextState = { ...nextState, activeEvent: event.id };
 
   return addLog(nextState, `Week ${nextState.week} started. Team capacity refreshed.`);
@@ -270,6 +275,30 @@ export function advanceWeek(
 export function pickRandomEvent(availableEvents: ScenarioEvent[]) {
   if (!availableEvents.length) return null;
   return availableEvents[Math.floor(Math.random() * availableEvents.length)];
+}
+
+export function pickStoryEvent(availableEvents: ScenarioEvent[]) {
+  return availableEvents[0] ?? null;
+}
+
+export function createReplayEventPicker(
+  scenario: Scenario,
+  settings: { eventOrder: EventOrder; eventFrequency: EventFrequency },
+) {
+  return (availableEvents: ScenarioEvent[], nextState: GameState) => {
+    if (settings.eventFrequency === "light" && nextState.week % 2 === 0) return null;
+
+    if (settings.eventFrequency === "risk-heavy") {
+      const riskEvent = availableEvents.find((event) =>
+        scenario.risks.some((risk) => risk.eventId === event.id && !hasMitigatedRisk(nextState, risk.id)),
+      );
+      if (riskEvent) return riskEvent;
+    }
+
+    return settings.eventOrder === "story"
+      ? pickStoryEvent(availableEvents)
+      : pickRandomEvent(availableEvents);
+  };
 }
 
 export function chooseEvent(scenario: Scenario, state: GameState, choiceIndex: number): GameState {

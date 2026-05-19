@@ -8,6 +8,7 @@ import {
   assignTask,
   chooseEvent,
   completedTasks,
+  createReplayEventPicker,
   createInitialState,
   finishProject,
   mitigateRisk,
@@ -69,5 +70,43 @@ describe("game rules", () => {
     expect(score.mentorSummary.headline).toContain("project decisions");
     expect(score.mentorSummary.talkingPoints.length).toBeGreaterThanOrEqual(3);
     expect(score.mentorSummary.challenge).toContain("Replay challenge");
+  });
+
+  it("supports replay event settings for story order and light frequency", () => {
+    let state = createInitialState(scenario);
+    state = advanceWeek(
+      scenario,
+      state,
+      createReplayEventPicker(scenario, { eventOrder: "story", eventFrequency: "light" }),
+    );
+
+    expect(state.week).toBe(2);
+    expect(state.activeEvent).toBeNull();
+
+    state = advanceWeek(
+      scenario,
+      state,
+      createReplayEventPicker(scenario, { eventOrder: "story", eventFrequency: "light" }),
+    );
+
+    expect(state.week).toBe(3);
+    expect(state.activeEvent).toBe("supplier-delay");
+  });
+
+  it("prioritizes unmitigated risk events in risk-heavy mode", () => {
+    const state = createInitialState(scenario);
+    const picker = createReplayEventPicker(scenario, {
+      eventOrder: "story",
+      eventFrequency: "risk-heavy",
+    });
+    const picked = picker(
+      [
+        scenario.events.find((event) => event.id === "prototype-leaks")!,
+        scenario.events.find((event) => event.id === "weather-risk")!,
+      ],
+      state,
+    );
+
+    expect(picked?.id).toBe("weather-risk");
   });
 });

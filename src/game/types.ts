@@ -1,5 +1,7 @@
 export type TaskStatus = "todo" | "doing" | "review" | "done";
 export type Difficulty = "easy" | "challenge";
+export type EventOrder = "random" | "story";
+export type EventFrequency = "light" | "normal" | "risk-heavy";
 export type EffectKey = "spent" | "quality" | "morale" | "trust";
 export type Effects = Partial<Record<EffectKey, number>>;
 
@@ -88,6 +90,8 @@ export interface GameState {
 export interface UIPrefs {
   activityCollapsed: boolean;
   difficulty: Difficulty;
+  eventOrder: EventOrder;
+  eventFrequency: EventFrequency;
 }
 
 export interface ScoreCard {

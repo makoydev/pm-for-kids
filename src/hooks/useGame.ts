@@ -6,12 +6,13 @@ import {
   advanceWeek,
   assignTask,
   chooseEvent,
+  createReplayEventPicker,
   createInitialState,
   finishProject,
   mitigateRisk,
   normalizeState,
 } from "../game/rules";
-import type { Difficulty, GameState, UIPrefs } from "../game/types";
+import type { Difficulty, EventFrequency, EventOrder, GameState, UIPrefs } from "../game/types";
 
 const STORAGE_KEY = "pm-for-kids-state-v2";
 const LEGACY_STORAGE_KEY = "pm-for-kids-state-v1";
@@ -50,15 +51,30 @@ function loadSavedGame() {
 function loadUIPrefs(): UIPrefs {
   try {
     const raw = window.localStorage.getItem(UI_PREFS_KEY);
-    if (!raw) return { activityCollapsed: true, difficulty: "easy" };
+    if (!raw) return defaultUIPrefs();
     const parsed = JSON.parse(raw) as Partial<UIPrefs>;
     return {
       activityCollapsed: parsed.activityCollapsed !== false,
       difficulty: parsed.difficulty === "challenge" ? "challenge" : "easy",
+      eventOrder: parsed.eventOrder === "story" ? "story" : "random",
+      eventFrequency: parseEventFrequency(parsed.eventFrequency),
     };
   } catch {
-    return { activityCollapsed: true, difficulty: "easy" };
+    return defaultUIPrefs();
   }
+}
+
+function defaultUIPrefs(): UIPrefs {
+  return {
+    activityCollapsed: true,
+    difficulty: "easy",
+    eventOrder: "random",
+    eventFrequency: "normal",
+  };
+}
+
+function parseEventFrequency(value: unknown): EventFrequency {
+  return value === "light" || value === "risk-heavy" ? value : "normal";
 }
 
 export function useGame() {
@@ -108,16 +124,26 @@ export function useGame() {
         toggleActivity();
       } else if (key === "n" && !state.finished) {
         event.preventDefault();
-        setState((current) => advanceWeek(scenario, current));
+        setState((current) =>
+          advanceWeek(scenario, current, createReplayEventPicker(scenario, uiPrefs)),
+        );
       }
     }
 
     document.addEventListener("keydown", handleKeyboardShortcuts);
     return () => document.removeEventListener("keydown", handleKeyboardShortcuts);
-  }, [glossaryOpen, scenario, scoreOpen, state.activeEvent, state.finished, toggleActivity]);
+  }, [glossaryOpen, scenario, scoreOpen, state.activeEvent, state.finished, toggleActivity, uiPrefs]);
 
   const setDifficulty = useCallback((difficulty: Difficulty) => {
     setUIPrefs((current) => ({ ...current, difficulty }));
+  }, []);
+
+  const setEventOrder = useCallback((eventOrder: EventOrder) => {
+    setUIPrefs((current) => ({ ...current, eventOrder }));
+  }, []);
+
+  const setEventFrequency = useCallback((eventFrequency: EventFrequency) => {
+    setUIPrefs((current) => ({ ...current, eventFrequency }));
   }, []);
 
   const selectScenario = useCallback((scenarioId: string) => {
@@ -142,7 +168,9 @@ export function useGame() {
         setState((current) => chooseEvent(scenario, current, choiceIndex));
       },
       advanceWeek: () => {
-        setState((current) => advanceWeek(scenario, current));
+        setState((current) =>
+          advanceWeek(scenario, current, createReplayEventPicker(scenario, uiPrefs)),
+        );
       },
       finishProject: () => {
         setState((current) => finishProject(current));
@@ -156,7 +184,7 @@ export function useGame() {
         setState((current) => ({ ...current, log: [] }));
       },
     }),
-    [scenario],
+    [scenario, uiPrefs],
   );
 
   useEffect(() => {
@@ -174,6 +202,8 @@ export function useGame() {
     setScoreOpen,
     setGlossaryOpen,
     setDifficulty,
+    setEventOrder,
+    setEventFrequency,
     selectScenario,
     toggleActivity,
     setActivityCollapsed: (activityCollapsed: boolean) =>
