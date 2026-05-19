@@ -51,7 +51,12 @@ describe("game rules", () => {
   });
 
   it("loads multiple JSON-backed scenarios", () => {
-    expect(scenarios.map((item) => item.id)).toEqual(["science-fair-booth", "birthday-party"]);
+    expect(scenarios.map((item) => item.id)).toEqual([
+      "science-fair-booth",
+      "birthday-party",
+      "class-garden",
+    ]);
     expect(scenarios[1].tasks.some((task) => task.id === "pick-theme")).toBe(true);
+    expect(scenarios[2].tasks.some((task) => task.id === "choose-location")).toBe(true);
   });
 });

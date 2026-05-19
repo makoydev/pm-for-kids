@@ -1,0 +1,253 @@
+{
+  "id": "class-garden",
+  "title": "Class Garden Build",
+  "goal": "Plan and build a small classroom garden before open house day.",
+  "deadlineWeeks": 4,
+  "budget": 90,
+  "team": [
+    {
+      "id": "ava",
+      "name": "Ava",
+      "role": "Researcher",
+      "skills": ["research", "plan"],
+      "capacity": 4
+    },
+    {
+      "id": "ben",
+      "name": "Ben",
+      "role": "Builder",
+      "skills": ["build", "test"],
+      "capacity": 5
+    },
+    {
+      "id": "zoe",
+      "name": "Zoe",
+      "role": "Designer",
+      "skills": ["design", "present"],
+      "capacity": 3
+    }
+  ],
+  "tasks": [
+    {
+      "id": "choose-location",
+      "title": "Choose garden location",
+      "effort": 1,
+      "cost": 0,
+      "skill": "plan",
+      "dependsOn": [],
+      "qualityImpact": 8
+    },
+    {
+      "id": "research-plants",
+      "title": "Research easy plants",
+      "effort": 2,
+      "cost": 0,
+      "skill": "research",
+      "dependsOn": ["choose-location"],
+      "qualityImpact": 12
+    },
+    {
+      "id": "make-layout",
+      "title": "Draw garden layout",
+      "effort": 2,
+      "cost": 0,
+      "skill": "design",
+      "dependsOn": ["choose-location", "research-plants"],
+      "qualityImpact": 12
+    },
+    {
+      "id": "buy-soil-seeds",
+      "title": "Buy soil and seeds",
+      "effort": 1,
+      "cost": 28,
+      "skill": "research",
+      "dependsOn": ["research-plants"],
+      "qualityImpact": 10
+    },
+    {
+      "id": "build-planters",
+      "title": "Build planter boxes",
+      "effort": 3,
+      "cost": 18,
+      "skill": "build",
+      "dependsOn": ["make-layout"],
+      "qualityImpact": 16
+    },
+    {
+      "id": "plant-seeds",
+      "title": "Plant seeds",
+      "effort": 2,
+      "cost": 8,
+      "skill": "build",
+      "dependsOn": ["buy-soil-seeds", "build-planters"],
+      "qualityImpact": 15
+    },
+    {
+      "id": "watering-schedule",
+      "title": "Create watering schedule",
+      "effort": 1,
+      "cost": 0,
+      "skill": "plan",
+      "dependsOn": ["plant-seeds"],
+      "qualityImpact": 12
+    },
+    {
+      "id": "open-house-signs",
+      "title": "Make open house signs",
+      "effort": 2,
+      "cost": 10,
+      "skill": "present",
+      "dependsOn": ["make-layout"],
+      "qualityImpact": 10
+    },
+    {
+      "id": "garden-cleanup",
+      "title": "Clean garden area",
+      "effort": 1,
+      "cost": 0,
+      "skill": "build",
+      "dependsOn": ["plant-seeds"],
+      "qualityImpact": 6
+    }
+  ],
+  "risks": [
+    {
+      "id": "weather-cover",
+      "title": "Rain might delay planting",
+      "description": "Prepare covers and an indoor seed tray backup.",
+      "eventId": "heavy-rain",
+      "cost": 6,
+      "response": {
+        "label": "Weather cover ready",
+        "outcome": "The covers protected the seedlings from the worst rain.",
+        "effects": { "quality": 5, "morale": 4 }
+      }
+    },
+    {
+      "id": "plant-check",
+      "title": "Some plants might not grow well",
+      "description": "Check which plants fit the classroom light and season.",
+      "eventId": "plants-wilting",
+      "cost": 5,
+      "response": {
+        "label": "Plant fit checked",
+        "outcome": "The plant research helped the team recover quickly.",
+        "effects": { "quality": 7, "trust": 3 }
+      }
+    },
+    {
+      "id": "tool-sharing",
+      "title": "Tools might be hard to share",
+      "description": "Create a tool rotation before building starts.",
+      "eventId": "tool-conflict",
+      "cost": 4,
+      "response": {
+        "label": "Tool rotation used",
+        "outcome": "The rotation kept building fair and organized.",
+        "effects": { "morale": 6, "trust": 2 }
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "heavy-rain",
+      "title": "Heavy rain is coming",
+      "body": "Rain may hit before the seeds settle into the planters.",
+      "choices": [
+        {
+          "label": "Cover the planters",
+          "outcome": "The seedlings stay safer, but setup takes extra attention.",
+          "lesson": "Small risk responses can protect a lot of project value.",
+          "effects": { "quality": 8, "morale": 2 }
+        },
+        {
+          "label": "Move planting indoors for now",
+          "outcome": "The team avoids the rain and can transplant later.",
+          "lesson": "Changing the method can keep the goal alive.",
+          "effects": { "trust": 4, "quality": 4 }
+        },
+        {
+          "label": "Keep the original plan",
+          "outcome": "The schedule stays simple, but seedlings may struggle.",
+          "lesson": "Ignoring clear risk signals can hurt quality.",
+          "effects": { "quality": -9, "trust": -4 }
+        }
+      ]
+    },
+    {
+      "id": "plants-wilting",
+      "title": "Some plants are wilting",
+      "body": "A few seedlings look weak after the first week.",
+      "choices": [
+        {
+          "label": "Check water and sunlight",
+          "outcome": "The team finds the likely cause and adjusts the care plan.",
+          "lesson": "Root cause thinking helps solve problems without guessing.",
+          "effects": { "quality": 9, "morale": 3 }
+        },
+        {
+          "label": "Buy replacement plants",
+          "outcome": "The garden looks better quickly, but it costs more.",
+          "lesson": "Extra budget can rescue quality when used thoughtfully.",
+          "effects": { "spent": 10, "quality": 6 }
+        },
+        {
+          "label": "Hide the weak plants",
+          "outcome": "The display looks cleaner, but the team misses a learning chance.",
+          "lesson": "Covering up problems does not improve the system.",
+          "effects": { "trust": -7, "quality": -5 }
+        }
+      ]
+    },
+    {
+      "id": "tool-conflict",
+      "title": "Two teammates need the same tools",
+      "body": "Building and cleanup both need the same gloves and trowels.",
+      "choices": [
+        {
+          "label": "Create a tool rotation",
+          "outcome": "The team shares fairly and keeps work moving.",
+          "lesson": "Resource planning prevents avoidable conflict.",
+          "effects": { "morale": 7, "trust": 3 }
+        },
+        {
+          "label": "Let the fastest person go first",
+          "outcome": "One task moves quickly, but others feel stuck.",
+          "lesson": "Local speed can still hurt overall flow.",
+          "effects": { "morale": -5, "quality": 2 }
+        },
+        {
+          "label": "Wait until everyone is free",
+          "outcome": "No one argues, but the schedule loses time.",
+          "lesson": "Avoiding conflict can still create delivery risk.",
+          "effects": { "trust": -4, "morale": -2 }
+        }
+      ]
+    },
+    {
+      "id": "teacher-feedback",
+      "title": "Teacher asks for clearer labels",
+      "body": "The teacher likes the garden but says visitors may not know what each plant is.",
+      "choices": [
+        {
+          "label": "Make simple plant labels",
+          "outcome": "Visitors understand the garden better.",
+          "lesson": "Good communication makes project value easier to see.",
+          "effects": { "quality": 8, "trust": 5, "spent": 3 }
+        },
+        {
+          "label": "Explain the plants during open house",
+          "outcome": "The team saves money, but someone must be ready to present.",
+          "lesson": "Service and support can be part of delivery.",
+          "effects": { "trust": 4, "morale": 2 }
+        },
+        {
+          "label": "Skip labels",
+          "outcome": "The team avoids extra work, but the garden is harder to understand.",
+          "lesson": "Finishing the build is not the same as making it useful.",
+          "effects": { "quality": -7, "trust": -3 }
+        }
+      ]
+    }
+  ]
+}

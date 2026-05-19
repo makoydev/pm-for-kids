@@ -36,4 +36,14 @@ describe("App", () => {
     expect(screen.getByRole("heading", { name: "Birthday Party Plan" })).toBeInTheDocument();
     expect(screen.getByText("Pick party theme")).toBeInTheDocument();
   });
+
+  it("includes the class garden scenario in the picker", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.selectOptions(screen.getByRole("combobox", { name: "Project" }), "class-garden");
+
+    expect(screen.getByRole("heading", { name: "Class Garden Build" })).toBeInTheDocument();
+    expect(screen.getByText("Choose garden location")).toBeInTheDocument();
+  });
 });
