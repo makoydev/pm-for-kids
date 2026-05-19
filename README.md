@@ -15,7 +15,7 @@ The app is now a Vite + React + TypeScript project:
 The playable project simulation lets kids:
 
 - Manage the School Science Fair Booth project.
-- Switch between JSON-authored project scenarios, including the Birthday Party Plan.
+- Switch between JSON-authored project scenarios, including the Birthday Party Plan and Class Garden Build.
 - Move tasks through `Todo`, `Doing`, `Review`, and `Done`.
 - Assign teammates based on capacity and skills.
 - Mitigate risks before matching scenario cards appear.
