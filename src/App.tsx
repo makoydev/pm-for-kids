@@ -42,8 +42,12 @@ export function App() {
         finished={game.state.finished}
         scenarios={game.scenarios}
         activeScenarioId={game.scenario.id}
+        eventOrder={game.uiPrefs.eventOrder}
+        eventFrequency={game.uiPrefs.eventFrequency}
         onDifficultyChange={game.setDifficulty}
         onScenarioChange={game.selectScenario}
+        onEventOrderChange={game.setEventOrder}
+        onEventFrequencyChange={game.setEventFrequency}
         onToggleActivity={game.toggleActivity}
         onOpenGlossary={() => game.setGlossaryOpen(true)}
         onReset={handleReset}

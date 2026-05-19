@@ -58,4 +58,15 @@ describe("App", () => {
     expect(screen.getByRole("heading", { name: "Parent and teacher notes" })).toBeInTheDocument();
     expect(screen.getByText(/Replay challenge/i)).toBeInTheDocument();
   });
+
+  it("updates replay settings from the header", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.selectOptions(screen.getByRole("combobox", { name: "Events" }), "story");
+    await user.selectOptions(screen.getByRole("combobox", { name: "Frequency" }), "risk-heavy");
+
+    expect(screen.getByRole("combobox", { name: "Events" })).toHaveValue("story");
+    expect(screen.getByRole("combobox", { name: "Frequency" })).toHaveValue("risk-heavy");
+  });
 });

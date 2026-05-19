@@ -1,5 +1,4 @@
-import type { Difficulty } from "../game/types";
-import type { Scenario } from "../game/types";
+import type { Difficulty, EventFrequency, EventOrder, Scenario } from "../game/types";
 import { Icon } from "./Icon";
 
 interface HeaderProps {
@@ -8,8 +7,12 @@ interface HeaderProps {
   finished: boolean;
   scenarios: Scenario[];
   activeScenarioId: string;
+  eventOrder: EventOrder;
+  eventFrequency: EventFrequency;
   onDifficultyChange: (difficulty: Difficulty) => void;
   onScenarioChange: (scenarioId: string) => void;
+  onEventOrderChange: (eventOrder: EventOrder) => void;
+  onEventFrequencyChange: (eventFrequency: EventFrequency) => void;
   onToggleActivity: () => void;
   onOpenGlossary: () => void;
   onReset: () => void;
@@ -22,8 +25,12 @@ export function Header({
   finished,
   scenarios,
   activeScenarioId,
+  eventOrder,
+  eventFrequency,
   onDifficultyChange,
   onScenarioChange,
+  onEventOrderChange,
+  onEventFrequencyChange,
   onToggleActivity,
   onOpenGlossary,
   onReset,
@@ -64,6 +71,27 @@ export function Header({
             ))}
           </select>
         </label>
+        <fieldset className="replay-settings">
+          <legend>Replay</legend>
+          <label>
+            <span>Events</span>
+            <select value={eventOrder} onChange={(event) => onEventOrderChange(event.target.value as EventOrder)}>
+              <option value="random">Random</option>
+              <option value="story">Story order</option>
+            </select>
+          </label>
+          <label>
+            <span>Frequency</span>
+            <select
+              value={eventFrequency}
+              onChange={(event) => onEventFrequencyChange(event.target.value as EventFrequency)}
+            >
+              <option value="light">Light</option>
+              <option value="normal">Normal</option>
+              <option value="risk-heavy">Risk-heavy</option>
+            </select>
+          </label>
+        </fieldset>
         <div className="difficulty-toggle" aria-label="Difficulty">
           {(["easy", "challenge"] as const).map((mode) => (
             <button
