@@ -22,6 +22,7 @@ The playable project simulation lets kids:
 - Watch budget, scope, quality, morale, and stakeholder trust.
 - Use the coach panel for the next suggested action and current project signals.
 - Compare scenario choice tradeoffs with effect chips before deciding.
+- Adjust replay settings for random/story event order and light/normal/risk-heavy event frequency.
 - Advance weeks and respond to PM scenario cards.
 - Finish the project to see a scorecard and retrospective.
 - Use the parent/teacher notes after a run for discussion prompts and a replay challenge.

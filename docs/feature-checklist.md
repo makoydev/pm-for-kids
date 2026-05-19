@@ -24,8 +24,8 @@ This checklist tracks the next features for PM for Kids. The goal is to keep eac
 - [x] Scenario data extraction into JSON so new projects can be authored without editing app logic.
 - [x] Add a class garden scenario.
 - [x] Parent or teacher summary with discussion prompts after the retrospective.
+- [x] Replay settings for event randomness and optional risk frequency.
 
 ## Later
 
 - [ ] Add a robot demo or bake sale scenario.
-- [ ] Replay settings for event randomness and optional risk frequency.
